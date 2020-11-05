@@ -14,14 +14,14 @@ However, internally 'luvi' (supplied by Luvi and Luvit) or 'fs' (supplied by Luv
 
 ## Usage
 Using Limport is as easy as triggering a function, like so: <br>
-``lua
+```lua
   local import = require('limport');
   import('json', 'json.lua', 'deps/json', 'deps/json.lua');
   require('json');
   require('json.lua');
   require('deps/json');
   require('deps/json.lua');
-`` <br>
+``` <br>
 In the example above, four variations can be used as inputs into Limport. <br>
 You have the option not to supply a file extension in the first input, which will search for files in the same directory for the name + .lua extension. <br>
 If the library is not a file, then you cannot add a file extension, so first and third inputs would be acceptable for directory libraries. <br>
