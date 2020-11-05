@@ -17,6 +17,7 @@ Using Limport is as easy as triggering a function, like so: <br>
 ```lua
   local import = require('limport');
   import('json', 'json.lua', 'deps/json', 'deps/json.lua');
+  
   require('json');
   require('json.lua');
   require('deps/json');
