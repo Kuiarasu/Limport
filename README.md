@@ -1,34 +1,62 @@
 # Limport
-"Limport" being short for lua import. Limport is a package that returns a function that will allow you to import files or directories as libraries regardless of the compiled require being able to support requiring supporting file and/or directory libraries.
+"Limport" short for lua import, is a small library that will allows you to import files or directories as lua libraries across different engines and platforms.
 
 ## Why was this made?
-The intention behind limport was to allow Luvi applications to require libraries might be directories, and for luvit to be able to require libraries that are in a project's base directory as simple as requiring lit installed libraries.
+Originally, limport was created to provide clean execution and adjustments for `require` on [Luvi](https://github.com/luvit/luvi) applications and [Luvit](https://github.com/luvit/luvit) projects. <br><br>
+
+```lua
+local limport = require('Limport');
+limport.import(
+	{
+		directory = 'json.lua';
+		cache = true;
+		key = 'json';
+	}
+);
+limport.import('json');
+```
 
 ## Installation
 You can install Limport using lit, `lit install Kuiarasu/Limport`. <br>
-If you are using Luvi or any other independent compiler or related, you can download `init.lua` into your directory, maybe renaming it to `limport.lua`.
+If your engine doesn't support lit, you may use `require` on the converted/non-converted version of the directory or `init.lua`, in which case you may rename `init.lua` to `limport.lua`
 
 ## Dependencies
-Limport doesn't depend on any external libraries outside of luvit. <br>
-However, internally 'luvi' (supplied by Luvi and Luvit) or 'fs' (supplied by Luvit) are the required libraries for limport.
+Limport requires functionality to access and read files, alternatively if the engine supports GET requests, if `Limport.makeshift.getRequest(string url, bool cache)` is set, it will be used to require the package that way.
 
 ## Usage
-Using Limport is as easy as triggering a function, like so: <br>
+Versions of Limport before 0.0.6 can be utilized by just a function, such as: <br>
 ```lua
-  local import = require('limport');
-  import('json', 'json.lua', 'deps/json', 'deps/json.lua');
+local import = require('Limport');
+import('json', 'json.lua', 'deps/json', 'deps/json.lua');
   
-  require('json');
-  require('json.lua');
-  require('deps/json');
-  require('deps/json.lua');
+require('json');
+require('json.lua');
+require('deps/json');
+require('deps/json.lua');
 ```
-<br>
-In the example above, four variations can be used as inputs into Limport. <br>
-You have the option not to supply a file extension in the first input, which will search for files in the same directory for the name + .lua extension. <br>
-If the library is not a file, then you cannot add a file extension, so first and third inputs would be acceptable for directory libraries. <br>
-You are also able to search into directories that are in the base directory of the program for modules also, also having the option to supply a file extension with the same rules applied. <br>
 
-You would require the imported libraries using the compiled require, like in the example above. You do not need to supply the same full length input into require as you did into Limport. <br>
-For instance, `import('json')` is usable through `require('json')` and `require('json.lua')`, and same rule applies if you used `import('json.lua')` instead. <br>
-For directory search inputs, they are also the same with two extra inputs. For instance, `import('deps/json')` or `import('deps/json.lua')` is usable through `require('json')`, `require('json.lua')`, `require('deps/json')`, or `require('deps/json.lua')`.
+Limport Version 0.0.6+ will present itself as a library. <br>
+`Limport.import(...)` is used to import packages as modules. <br>
+```lua
+local limport = require('Limport');
+local import = limport.import;
+import('json', {
+	directory = 'json.lua';
+	cache = true;
+	key = 'json';
+});
+require('json');
+```
+You may import as many libraries at once by supplying more parameters into `Limport.import(...)`, which can either be a string or a table.<br>
+String parameters will be interpreted as an in-project directory or external directory and as the preload/load keys for `require`. Preload/load key can either include or not include full directories with or without full `.lua` or other extensions. <br>
+
+Table parameters will split data and customization for each package, which will take into account the true directory to the package via `directory`, whether the package will be cached after being preloaded `cache`, and the preload/load `key` for `require`.
+
+## Compatability
+[Luvit](https://github.com/luvit/luvit), [Luvi](https://github.com/luvit/luvi) and [Love2D](https://github.com/love2d/love) compatabilities are built into Limport. <br>
+* If the engine has the full Lua 5.1+ API or with `io` and `package` APIs being supported, Limport will also work there too. <br>
+* If the engine does not meet the requirements above, Limport can import packages via GET requests if `Limport.makeshift.getRequest(string url, bool cache)` is defined manually. Makeshift will need the body as the first return.<br>
+* If all the above is not supported, Limport also supports utilizing makeshift functions to help with compatability problems, such as <br>
+`Limport.makeshift.read(string fullDirectory)` for reading files, body is expected as first return.<br>
+`Limport.makeshift.stat(string fullDirectory)` to identify as a file or directory. If not defined, Limport will make utilize it's own makeshift version using `Limport.makeshift.read`, table {string type "directory" or "file"} or string "file or "directory" is expected as first return.<br>
+* Additionally, you may import packages by supplying source code. You will have to create an internal key using `Limport.newDataPackage(string key, string body)`.
